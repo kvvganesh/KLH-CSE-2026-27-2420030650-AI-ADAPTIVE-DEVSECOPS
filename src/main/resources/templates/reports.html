@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Reports')}"></head>
+<body>
+<div class="app">
+  <aside th:replace="~{fragments :: sidebar('reports')}"></aside>
+  <main>
+    <header th:replace="~{fragments :: topbar('Reports', false)}"></header>
+    <section class="content">
+      <div class="card">
+        <h2>Generate report</h2>
+        <div class="actions" style="align-items:center">
+          <select id="reportProject" style="max-width:280px"><option th:each="p : ${allProjects}" th:value="${p.id}" th:text="${p.name}"></option></select>
+          <button class="btn" data-action="report">GENERATE REPORT</button>
+          <span class="muted small">Downloads an HTML report for the project's latest pipeline run.</span>
+        </div>
+      </div>
+      <div class="card section">
+        <h2>Security assessments</h2>
+        <div class="tablewrap"><table>
+          <thead><tr><th>Project</th><th>Pipeline ID</th><th>Date</th><th>JUnit</th><th>SonarQube</th><th>Gitleaks</th><th>OWASP</th><th>Score</th><th>Risk</th><th>Decision</th><th>Report</th></tr></thead>
+          <tbody>
+            <tr th:each="r : ${runs}">
+              <td th:text="${r.projectName}">p</td>
+              <td th:text="'#' + ${r.id}">#1</td>
+              <td th:text="${r.startedAt}">d</td>
+              <td th:text="${r.scan.testsPassed()} + '/' + ${r.scan.testsTotal} + ' passed'">x</td>
+              <td th:text="${r.scan.qualityGatePassed} ? 'Gate passed' : 'Gate failed'">x</td>
+              <td th:text="${r.scan.secrets} + ' secrets'">0</td>
+              <td th:text="${r.scan.depCritical} + 'C / ' + ${r.scan.depHigh} + 'H / ' + ${r.scan.depMedium} + 'M / ' + ${r.scan.depLow} + 'L'">x</td>
+              <td th:text="${r.risk.score}">0</td>
+              <td><span class="badge" th:classappend="'b-' + ${r.risk.level}" th:text="${r.risk.level}">x</span></td>
+              <td><span class="badge" th:classappend="'b-' + ${r.decision.decision}" th:text="${r.decision.decision.label}">x</span></td>
+              <td><div class="actions">
+                <a class="btn sm ghost" th:href="@{/api/reports/{id}/html(id=${r.id})}" target="_blank" rel="noopener">View</a>
+                <a class="btn sm ghost" th:href="@{/api/reports/{id}/html(id=${r.id},download=true)}">Download</a>
+              </div></td>
+            </tr>
+          </tbody>
+        </table></div>
+      </div>
+    </section>
+  </main>
+</div>
+<div th:replace="~{fragments :: foot}"></div>
+</body>
+</html>

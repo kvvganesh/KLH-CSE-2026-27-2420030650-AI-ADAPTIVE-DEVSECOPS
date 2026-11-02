@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Vulnerability assessment')}"></head>
+<body>
+<div class="app">
+  <aside th:replace="~{fragments :: sidebar('vulnerabilities')}"></aside>
+  <main>
+    <header th:replace="~{fragments :: topbar('Vulnerability assessment', true)}"></header>
+    <section class="content">
+      <th:block th:if="${run == null}"><div th:replace="~{fragments :: empty}"></div></th:block>
+      <th:block th:if="${run != null}">
+        <div class="card">
+          <div class="actions" style="margin-bottom:12px">
+            <button class="btn sm" data-action="filter" data-sev="ALL">All</button>
+            <button class="btn sm ghost" data-action="filter" data-sev="CRITICAL">Critical</button>
+            <button class="btn sm ghost" data-action="filter" data-sev="HIGH">High</button>
+            <button class="btn sm ghost" data-action="filter" data-sev="MEDIUM">Medium</button>
+            <button class="btn sm ghost" data-action="filter" data-sev="LOW">Low</button>
+          </div>
+          <div class="tablewrap"><table>
+            <thead><tr><th>Issue</th><th>Severity</th><th>Tool</th><th>Status</th><th>Recommendation</th></tr></thead>
+            <tbody>
+              <tr th:each="v : ${run.scan.findings}" th:data-sev="${v.severity}">
+                <td th:text="${v.issue}">Issue</td>
+                <td><span class="badge" th:classappend="'b-' + ${v.severity}" th:text="${v.severity}">x</span></td>
+                <td th:text="${v.tool}">tool</td>
+                <td><span class="badge" th:classappend="'b-' + ${v.status}" th:text="${v.status}">Open</span></td>
+                <td th:text="${v.recommendation}">rec</td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(run.scan.findings)}"><td colspan="5" class="muted">No findings.</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+        <div class="actions section"><a class="btn" th:href="@{/risk(project=${selected.id})}">Continue to risk analysis</a></div>
+      </th:block>
+    </section>
+  </main>
+</div>
+<div th:replace="~{fragments :: foot}"></div>
+</body>
+</html>

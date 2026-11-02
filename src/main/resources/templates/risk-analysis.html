@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Risk analysis')}"></head>
+<body>
+<div class="app">
+  <aside th:replace="~{fragments :: sidebar('risk')}"></aside>
+  <main>
+    <header th:replace="~{fragments :: topbar('Risk analysis', true)}"></header>
+    <section class="content">
+      <th:block th:if="${run == null}"><div th:replace="~{fragments :: empty}"></div></th:block>
+      <th:block th:if="${run != null}" th:with="r=${run.risk}">
+        <div class="grid g2">
+          <div class="card">
+            <h2>Risk score</h2>
+            <div class="score" th:text="${r.score}">0</div>
+            <div style="margin:8px 0"><span class="badge" th:classappend="'b-' + ${r.level}" th:text="${r.level} + ' RISK'">LOW</span></div>
+            <div class="bar" th:classappend="${r.level}"><span th:style="'width:' + ${r.score} + '%'"></span></div>
+            <p class="muted small">LOW below <span th:text="${thresholds.mediumThreshold}">30</span> &middot; MEDIUM <span th:text="${thresholds.mediumThreshold}">30</span> to <span th:text="${thresholds.highThreshold - 1}">59</span> &middot; HIGH <span th:text="${thresholds.highThreshold}">60</span> and above</p>
+            <h3 style="margin-top:16px">Recommended action</h3>
+            <p><strong th:text="${r.recommendedAction}">action</strong></p>
+          </div>
+          <div class="card">
+            <h2>Reasons</h2>
+            <ul class="reasons" th:unless="${#lists.isEmpty(r.factors)}">
+              <li th:each="f : ${r.factors}"><span th:text="${f.description}">reason</span> <b th:text="'+' + ${f.points}">+10</b></li>
+            </ul>
+            <p class="muted" th:if="${#lists.isEmpty(r.factors)}">No risk factors detected. All gates passed.</p>
+            <p class="muted small">Explainable rule-based engine. Not a machine-learning model: each signal adds fixed points (capped at 100).</p>
+          </div>
+        </div>
+        <div class="card section">
+          <h2>Scoring rules</h2>
+          <table><thead><tr><th>Signal</th><th>Points</th></tr></thead>
+            <tbody><tr th:each="rule : ${rules}"><td th:text="${rule.description}">rule</td><td th:text="'+' + ${rule.points}">+1</td></tr></tbody></table>
+        </div>
+        <div class="actions section"><a class="btn" th:href="@{/deployments(project=${selected.id})}">Continue to deployment decision</a></div>
+      </th:block>
+    </section>
+  </main>
+</div>
+<div th:replace="~{fragments :: foot}"></div>
+</body>
+</html>

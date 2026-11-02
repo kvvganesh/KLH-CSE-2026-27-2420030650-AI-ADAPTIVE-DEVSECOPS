@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Settings')}"></head>
+<body>
+<div class="app">
+  <aside th:replace="~{fragments :: sidebar('settings')}"></aside>
+  <main>
+    <header th:replace="~{fragments :: topbar('Settings', false)}"></header>
+    <section class="content">
+      <p class="note">Read-only view. Change thresholds in <code>application.properties</code> (<code>devsecops.risk.*</code>) and restart.</p>
+      <div class="grid g2">
+        <div class="card">
+          <h2>Risk thresholds</h2>
+          <table><tbody>
+            <tr><td><span class="badge b-LOW">LOW</span></td><td th:text="'0 - ' + ${thresholds.mediumThreshold - 1}">0-29</td><td>Deployment approved</td></tr>
+            <tr><td><span class="badge b-MEDIUM">MEDIUM</span></td><td th:text="${thresholds.mediumThreshold} + ' - ' + ${thresholds.highThreshold - 1}">30-59</td><td>Security review required</td></tr>
+            <tr><td><span class="badge b-HIGH">HIGH</span></td><td th:text="${thresholds.highThreshold} + '+'">60+</td><td>Deployment blocked</td></tr>
+          </tbody></table>
+        </div>
+        <div class="card">
+          <h2>Enabled security tools</h2>
+          <table><tbody>
+            <tr><td>JUnit</td><td>Unit and security tests</td><td><span class="badge b-PASSED">Enabled</span></td></tr>
+            <tr><td>SonarQube</td><td>Static code analysis</td><td><span class="badge b-PASSED">Enabled</span></td></tr>
+            <tr><td>Gitleaks</td><td>Secret detection</td><td><span class="badge b-PASSED">Enabled</span></td></tr>
+            <tr><td>OWASP Dependency-Check</td><td>Vulnerable dependencies</td><td><span class="badge b-PASSED">Enabled</span></td></tr>
+          </tbody></table>
+        </div>
+      </div>
+      <div class="card section">
+        <h2>Live scan configuration</h2>
+        <table><tbody>
+          <tr><td>JUnit (Maven)</td><td>Always runs</td></tr>
+          <tr><td>Gitleaks</td><td>Runs if the <code>gitleaks</code> command is installed</td></tr>
+          <tr><td>SonarQube</td><td><span class="badge" th:classappend="${sonarConfigured} ? 'b-PASSED' : 'b-PENDING'" th:text="${sonarConfigured} ? 'Configured' : 'Not configured'">x</span></td></tr>
+          <tr><td>OWASP Dependency-Check</td><td><span class="badge" th:classappend="${depCheckEnabled} ? 'b-PASSED' : 'b-PENDING'" th:text="${depCheckEnabled} ? 'Enabled' : 'Disabled (slow first run)'">x</span></td></tr>
+        </tbody></table>
+        <p class="muted small">Set <code>devsecops.scan.*</code> in application.properties. See the README.</p>
+      </div>
+      <div class="card section">
+        <h2>Scoring weights</h2>
+        <table><thead><tr><th>Signal</th><th>Points</th></tr></thead>
+          <tbody><tr th:each="rule : ${rules}"><td th:text="${rule.description}">r</td><td th:text="'+' + ${rule.points}">+1</td></tr></tbody></table>
+      </div>
+    </section>
+  </main>
+</div>
+<div th:replace="~{fragments :: foot}"></div>
+</body>
+</html>

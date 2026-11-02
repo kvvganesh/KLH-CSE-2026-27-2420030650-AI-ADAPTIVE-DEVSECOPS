@@ -1,0 +1,4 @@
+title = "Adaptive DevSecOps gitleaks config"
+
+[extend]
+useDefault = true

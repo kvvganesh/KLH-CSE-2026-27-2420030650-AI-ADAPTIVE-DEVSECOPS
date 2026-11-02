@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Documentation')}"></head>
+<body>
+<div class="app">
+  <aside th:replace="~{fragments :: sidebar('documentation')}"></aside>
+  <main>
+    <header th:replace="~{fragments :: topbar('Documentation', false)}"></header>
+    <section class="content doc">
+      <div class="docnav">
+        <a href="#overview">Overview</a><a href="#problem">Problem</a><a href="#pipeline">Pipeline</a><a href="#tools">Security tools</a>
+        <a href="#risk">Risk assessment</a><a href="#deploy">Adaptive deployment</a><a href="#stack">Technology</a><a href="#arch">Architecture</a>
+      </div>
+      <div class="card" id="overview"><h2>Project overview</h2>
+        <p>Adaptive DevSecOps Pipeline for Intelligent Vulnerability Assessment and Secure Deployment is a demonstration platform. It combines the results of four security tools into one risk score and uses that score to decide whether a release may be deployed.</p></div>
+      <div class="card section" id="problem"><h2>Problem statement</h2>
+        <p>Security tools produce separate reports that teams read late or inconsistently. Pipelines then either ignore findings or fail on every warning. This project turns the signals into one explainable decision that adapts to the actual risk.</p></div>
+      <div class="card section" id="pipeline"><h2>How the pipeline works</h2>
+        <div class="arch"><span class="box">Source</span>&rarr;<span class="box">Build</span>&rarr;<span class="box">JUnit</span>&rarr;<span class="box">SonarQube</span>&rarr;<span class="box">Gitleaks</span>&rarr;<span class="box">OWASP</span>&rarr;<span class="box">Risk analysis</span>&rarr;<span class="box">Deployment decision</span></div>
+        <p>The real workflow lives in <code>.github/workflows/devsecops.yml</code>. The web application simulates a run so the full flow can be demonstrated offline with three fixed scenarios.</p></div>
+      <div class="card section" id="tools"><h2>Security tools</h2>
+        <ul><li><b>JUnit</b>: unit and security tests of the application.</li>
+          <li><b>SonarQube</b>: code quality, bugs, code vulnerabilities and the quality gate.</li>
+          <li><b>Gitleaks</b>: detects secrets committed to the repository.</li>
+          <li><b>OWASP Dependency-Check</b>: finds dependencies with known vulnerabilities.</li></ul></div>
+      <div class="card section" id="risk"><h2>Risk assessment</h2>
+        <p>An explainable rule-based engine (not machine learning). Each signal adds points: critical secret +50, critical dependency +50, high +25, medium +15, quality gate failure +15, failed tests +10. The total is capped at 100. LOW is 0&ndash;29, MEDIUM 30&ndash;59, HIGH 60 and above.</p></div>
+      <div class="card section" id="deploy"><h2>Adaptive deployment</h2>
+        <table><tbody>
+          <tr><td><span class="badge b-LOW">LOW</span></td><td>Deployment approved</td></tr>
+          <tr><td><span class="badge b-MEDIUM">MEDIUM</span></td><td>Security review required</td></tr>
+          <tr><td><span class="badge b-HIGH">HIGH</span></td><td>Deployment blocked</td></tr></tbody></table>
+        <p class="muted">Deployments are simulated. Nothing is released anywhere.</p></div>
+      <div class="card section" id="stack"><h2>Technology stack</h2>
+        <p>Java 21, Spring Boot 4, Maven, Thymeleaf, HTML/CSS/JavaScript, JUnit, SonarQube, Gitleaks, OWASP Dependency-Check, Git, GitHub and GitHub Actions. Data is held in memory, so no database is needed.</p></div>
+      <div class="card section" id="arch"><h2>Architecture</h2>
+        <div class="arch"><span class="box">Browser (Thymeleaf pages + app.js)</span>&rarr;<span class="box">Controllers (pages + REST API)</span>&rarr;<span class="box">Services</span>&rarr;<span class="box">Repositories</span>&rarr;<span class="box">Models</span></div>
+        <p>Pages are rendered by <code>PageController</code>. Actions (run pipeline, add project, switch scenario, simulate deployment, download report) call the REST API under <code>/api</code>.</p></div>
+    </section>
+  </main>
+</div>
+<div th:replace="~{fragments :: foot}"></div>
+</body>
+</html>

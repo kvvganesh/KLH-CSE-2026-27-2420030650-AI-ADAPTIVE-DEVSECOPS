@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Dashboard')}"></head>
+<body>
+<div class="app">
+  <aside th:replace="~{fragments :: sidebar('dashboard')}"></aside>
+  <main>
+    <header th:replace="~{fragments :: topbar('Dashboard', false)}"></header>
+    <section class="content">
+      <div class="grid g6">
+        <div class="card stat"><div class="num" th:text="${stats.totalProjects}">0</div><div class="lbl">Total projects</div></div>
+        <div class="card stat"><div class="num" th:text="${stats.pipelineRuns}">0</div><div class="lbl">Pipeline runs</div></div>
+        <div class="card stat amber"><div class="num" th:text="${stats.securityIssues}">0</div><div class="lbl">Security issues</div></div>
+        <div class="card stat red"><div class="num" th:text="${stats.criticalVulnerabilities}">0</div><div class="lbl">Critical vulnerabilities</div></div>
+        <div class="card stat red"><div class="num" th:text="${stats.secretsDetected}">0</div><div class="lbl">Secrets detected</div></div>
+        <div class="card stat red"><div class="num" th:text="${stats.blockedDeployments}">0</div><div class="lbl">Blocked deployments</div></div>
+      </div>
+      <p class="muted small section">Issue, critical and secret counts reflect the latest run of each project.</p>
+
+      <div class="card section">
+        <h2>Recent pipeline runs</h2>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Project</th><th>Pipeline</th><th>Status</th><th>Risk</th><th>Decision</th><th></th></tr></thead>
+            <tbody>
+              <tr th:each="r : ${recentRuns}">
+                <td><a th:href="@{/projects/{id}(id=${r.projectId})}" th:text="${r.projectName}">Project</a></td>
+                <td th:text="'Pipeline #' + ${r.id}">Pipeline #1</td>
+                <td><span class="badge" th:classappend="'b-' + ${r.status}" th:text="${r.status}">PASSED</span></td>
+                <td><span class="badge" th:classappend="'b-' + ${r.risk.level}" th:text="${r.risk.level}">LOW</span></td>
+                <td><span class="badge" th:classappend="'b-' + ${r.decision.decision}" th:text="${r.decision.decision.label}">Approved</span></td>
+                <td><a th:href="@{/pipelines(project=${r.projectId})}">Open pipeline</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section actions">
+        <a class="btn" th:href="@{/projects}">Manage projects</a>
+        <a class="btn ghost" th:href="@{/security-scans}">Security scans</a>
+        <a class="btn ghost" th:href="@{/risk}">Risk analysis</a>
+        <a class="btn ghost" th:href="@{/reports}">Reports</a>
+      </div>
+    </section>
+  </main>
+</div>
+<div th:replace="~{fragments :: foot}"></div>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Projects')}"></head>
+<body>
+<div class="app">
+  <aside th:replace="~{fragments :: sidebar('projects')}"></aside>
+  <main>
+    <header th:replace="~{fragments :: topbar('Projects', false)}"></header>
+    <section class="content">
+      <div class="card">
+        <h2>Projects</h2>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Project</th><th>Repository</th><th>Branch</th><th>Last scan</th><th>Risk</th><th>Pipeline</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr th:each="s : ${summaries}">
+                <td><strong th:text="${s.project.name}">Name</strong></td>
+                <td class="muted" th:text="${s.project.repositoryUrl}">url</td>
+                <td th:text="${s.project.branch}">main</td>
+                <td th:text="${s.lastRun != null} ? ${s.lastRun.startedAt} : 'Never'">Never</td>
+                <td><span th:if="${s.lastRun != null}" class="badge" th:classappend="'b-' + ${s.lastRun.risk.level}" th:text="${s.lastRun.risk.level}">LOW</span><span th:if="${s.lastRun == null}" class="muted">-</span></td>
+                <td><span th:if="${s.lastRun != null}" class="badge" th:classappend="'b-' + ${s.lastRun.status}" th:text="${s.lastRun.status}">PASSED</span><span th:if="${s.lastRun == null}" class="muted">Not run</span></td>
+                <td><div class="actions">
+                  <a class="btn sm ghost" th:href="@{/projects/{id}(id=${s.project.id})}">View</a>
+                  <button class="btn sm" data-action="run" th:data-project="${s.project.id}">Run Pipeline</button>
+                  <a class="btn sm ghost" th:href="@{/security-scans(project=${s.project.id})}">Security Scan</a>
+                </div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card section">
+        <h2>Add project</h2>
+        <form id="projectForm" class="grid g2" novalidate>
+          <div class="form-row"><label for="name">Project name</label><input id="name" name="name" placeholder="Billing Service"></div>
+          <div class="form-row"><label for="repositoryUrl">Repository URL</label><input id="repositoryUrl" name="repositoryUrl" placeholder="https://github.com/your-org/repo  or  C:\\path\\to\\repo"></div>
+          <div class="form-row"><label for="branch">Branch</label><input id="branch" name="branch" value="main"></div>
+          <div class="form-row"><label for="scenario">Scan mode (Live = real local scan of the repository)</label>
+            <select id="scenario" name="scenario"><option th:each="s : ${scenarios}" th:value="${s.name()}" th:text="${s.label}" th:selected="${s.name() == 'LIVE'}"></option></select></div>
+          <div class="form-row" style="grid-column:1/-1"><label for="description">Description</label><textarea id="description" name="description" rows="2"></textarea></div>
+          <div><button class="btn" type="submit">Add project</button></div>
+        </form>
+      </div>
+    </section>
+  </main>
+</div>
+<div th:replace="~{fragments :: foot}"></div>
+</body>
+</html>

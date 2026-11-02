@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Security scans')}"></head>
+<body>
+<div class="app">
+  <aside th:replace="~{fragments :: sidebar('scans')}"></aside>
+  <main>
+    <header th:replace="~{fragments :: topbar('Security scans', true)}"></header>
+    <section class="content">
+      <th:block th:if="${run == null}"><div th:replace="~{fragments :: empty}"></div></th:block>
+      <th:block th:if="${run != null}" th:with="s=${run.scan}">
+        <p class="note" th:text="${selected.scenario.name() == 'LIVE'} ? ('Real results from a local scan of the cloned repository (pipeline #' + ${run.id} + '). Logs: see the workspace folder in the README.') : ('Representative recorded results for pipeline #' + ${run.id} + ' (simulated demo scenario).')">note</p>
+        <div class="note" style="border-color:#f59e0b66;color:#f5c26b" th:unless="${#maps.isEmpty(s.skipped)}">
+          <b>Not scanned:</b>
+          <div th:each="e : ${s.skipped}" th:text="${e.key} + ': ' + ${e.value}">reason</div>
+        </div>
+        <div class="grid g4">
+          <div class="card tool-card">
+            <h2>JUnit <span class="badge" th:classappend="${s.testsFailed > 0} ? 'b-FAILED' : 'b-PASSED'" th:text="${s.testsFailed > 0} ? 'FAILED' : 'PASSED'">PASSED</span></h2>
+            <div class="metric"><span>Tests passed</span><b th:text="${s.testsPassed()}">0</b></div>
+            <div class="metric"><span>Tests failed</span><b th:text="${s.testsFailed}">0</b></div>
+            <div class="metric"><span>Total</span><b th:text="${s.testsTotal}">0</b></div>
+          </div>
+          <div class="card tool-card">
+            <h2>SonarQube <span class="badge" th:classappend="${s.qualityGatePassed} ? 'b-PASSED' : 'b-FAILED'" th:text="${s.qualityGatePassed} ? 'GATE PASSED' : 'GATE FAILED'">x</span></h2>
+            <p class="muted small" th:if="${s.skipped.containsKey('SONARQUBE')}">Not scanned, values below are not meaningful.</p>
+            <div class="metric"><span>Quality gate</span><b th:text="${s.qualityGatePassed} ? 'Passed' : 'Failed'">x</b></div>
+            <div class="metric"><span>Bugs</span><b th:text="${s.bugs}">0</b></div>
+            <div class="metric"><span>Vulnerabilities</span><b th:text="${s.vulnerabilities}">0</b></div>
+            <div class="metric"><span>Code smells</span><b th:text="${s.codeSmells}">0</b></div>
+          </div>
+          <div class="card tool-card">
+            <h2>Gitleaks <span class="badge" th:classappend="${s.secrets > 0} ? 'b-FAILED' : 'b-PASSED'" th:text="${s.secrets > 0} ? 'LEAK FOUND' : 'CLEAN'">x</span></h2>
+            <p class="muted small" th:if="${s.skipped.containsKey('GITLEAKS')}">Not scanned, values below are not meaningful.</p>
+            <div class="metric"><span>Secrets detected</span><b th:text="${s.secrets}">0</b></div>
+            <div class="metric"><span>Severity</span><b th:text="${s.secretSeverity != null} ? ${s.secretSeverity} : 'None'">None</b></div>
+            <div class="metric"><span>Status</span><b th:text="${s.secrets > 0} ? 'Open' : 'Clean'">Clean</b></div>
+          </div>
+          <div class="card tool-card">
+            <h2>OWASP Dependency-Check <span class="badge" th:classappend="${s.depCritical + s.depHigh > 0} ? 'b-FAILED' : (${s.depMedium > 0} ? 'b-MEDIUM' : 'b-PASSED')" th:text="${s.depCritical + s.depHigh > 0} ? 'VULNERABLE' : (${s.depMedium > 0} ? 'WARNING' : 'OK')">x</span></h2>
+            <p class="muted small" th:if="${s.skipped.containsKey('OWASP')}">Not scanned, values below are not meaningful.</p>
+            <div class="metric"><span>Dependencies scanned</span><b th:text="${s.dependenciesScanned}">0</b></div>
+            <div class="metric"><span>Critical</span><b th:text="${s.depCritical}">0</b></div>
+            <div class="metric"><span>High</span><b th:text="${s.depHigh}">0</b></div>
+            <div class="metric"><span>Medium</span><b th:text="${s.depMedium}">0</b></div>
+            <div class="metric"><span>Low</span><b th:text="${s.depLow}">0</b></div>
+          </div>
+        </div>
+        <div class="actions section"><a class="btn" th:href="@{/vulnerabilities(project=${selected.id})}">View vulnerability assessment</a></div>
+      </th:block>
+    </section>
+  </main>
+</div>
+<div th:replace="~{fragments :: foot}"></div>
+</body>
+</html>

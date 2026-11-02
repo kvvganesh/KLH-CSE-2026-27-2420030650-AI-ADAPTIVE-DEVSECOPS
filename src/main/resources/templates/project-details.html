@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Project details')}"></head>
+<body>
+<div class="app">
+  <aside th:replace="~{fragments :: sidebar('projects')}"></aside>
+  <main>
+    <header th:replace="~{fragments :: topbar('Project details', false)}"></header>
+    <section class="content" th:with="p=${summary.project}, r=${summary.lastRun}">
+      <div class="grid g2">
+        <div class="card">
+          <h2 th:text="${p.name}">Project</h2>
+          <dl class="kv">
+            <dt>Repository</dt><dd th:text="${p.repositoryUrl}">url</dd>
+            <dt>Branch</dt><dd th:text="${p.branch}">main</dd>
+            <dt>Description</dt><dd th:text="${#strings.isEmpty(p.description)} ? '-' : ${p.description}">desc</dd>
+            <dt>Demo scenario</dt><dd th:text="${p.scenario.label}">Safe</dd>
+            <dt>Last pipeline</dt><dd th:text="${r != null} ? ('#' + ${r.id} + ' (' + ${r.status} + ')') : 'Not run yet'">#1</dd>
+            <dt>Last scan</dt><dd th:text="${r != null} ? ${r.startedAt} : 'Never'">never</dd>
+          </dl>
+        </div>
+        <div class="card">
+          <h2>Security posture</h2>
+          <div th:if="${r == null}" class="muted">Run the pipeline to calculate risk.</div>
+          <dl class="kv" th:if="${r != null}">
+            <dt>Risk score</dt><dd><strong th:text="${r.risk.score}">0</strong> / 100</dd>
+            <dt>Risk level</dt><dd><span class="badge" th:classappend="'b-' + ${r.risk.level}" th:text="${r.risk.level}">LOW</span></dd>
+            <dt>Deployment</dt><dd><span class="badge" th:classappend="'b-' + ${r.decision.decision}" th:text="${r.decision.decision.label}">x</span></dd>
+          </dl>
+        </div>
+      </div>
+      <div class="actions section">
+        <button class="btn" data-action="run" th:data-project="${p.id}">Run Pipeline</button>
+        <a class="btn ghost" th:href="@{/security-scans(project=${p.id})}">Security Scan</a>
+        <a class="btn ghost" th:href="@{/risk(project=${p.id})}">Risk Analysis</a>
+        <a class="btn ghost" th:href="@{/deployments(project=${p.id})}">Deployment</a>
+        <a class="btn ghost" th:if="${r != null}" th:href="@{/api/projects/{id}/report(id=${p.id})}" target="_blank" rel="noopener">View Report</a>
+      </div>
+      <div class="card section">
+        <h2>Pipeline history</h2>
+        <div class="tablewrap"><table>
+          <thead><tr><th>Pipeline</th><th>Date</th><th>Status</th><th>Score</th><th>Risk</th><th>Decision</th></tr></thead>
+          <tbody>
+            <tr th:each="h : ${history}">
+              <td th:text="'#' + ${h.id}">#1</td><td th:text="${h.startedAt}">date</td>
+              <td><span class="badge" th:classappend="'b-' + ${h.status}" th:text="${h.status}">x</span></td>
+              <td th:text="${h.risk.score}">0</td>
+              <td><span class="badge" th:classappend="'b-' + ${h.risk.level}" th:text="${h.risk.level}">x</span></td>
+              <td th:text="${h.decision.decision.label}">x</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(history)}"><td colspan="6" class="muted">No runs yet.</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </section>
+  </main>
+</div>
+<div th:replace="~{fragments :: foot}"></div>
+</body>
+</html>

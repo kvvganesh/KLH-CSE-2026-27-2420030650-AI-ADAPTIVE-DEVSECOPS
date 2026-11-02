@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Error')}"></head>
+<body>
+<div class="login">
+  <div class="card empty">
+    <h1 th:text="${status != null} ? ${status} : 'Error'">404</h1>
+    <p th:text="${#strings.isEmpty(message)} ? 'Something went wrong.' : ${message}">Message</p>
+    <a class="btn" th:href="@{/dashboard}">Back to dashboard</a>
+  </div>
+</div>
+</body>
+</html>

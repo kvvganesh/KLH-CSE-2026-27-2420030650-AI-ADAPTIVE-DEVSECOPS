@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Deployment decision')}"></head>
+<body>
+<div class="app">
+  <aside th:replace="~{fragments :: sidebar('deployments')}"></aside>
+  <main>
+    <header th:replace="~{fragments :: topbar('Deployment decision', true)}"></header>
+    <section class="content">
+      <th:block th:if="${run == null}"><div th:replace="~{fragments :: empty}"></div></th:block>
+      <th:block th:if="${run != null}" th:with="d=${run.decision}, r=${run.risk}">
+        <div class="banner" th:classappend="${d.decision}">
+          <div class="icon" th:text="${d.decision.icon}">✓</div>
+          <div class="label" th:text="${d.decision.label}">DEPLOYMENT APPROVED</div>
+          <div th:text="${d.message}">message</div>
+        </div>
+        <div class="grid g2 section">
+          <div class="card">
+            <h2>Assessment</h2>
+            <dl class="kv">
+              <dt>Project</dt><dd th:text="${selected.name}">x</dd>
+              <dt>Pipeline</dt><dd th:text="'#' + ${run.id}">#1</dd>
+              <dt>Current risk score</dt><dd><strong th:text="${r.score}">0</strong></dd>
+              <dt>Risk level</dt><dd><span class="badge" th:classappend="'b-' + ${r.level}" th:text="${r.level}">x</span></dd>
+              <dt>Recommended action</dt><dd th:text="${r.recommendedAction}">x</dd>
+            </dl>
+          </div>
+          <div class="card">
+            <h2>Reasons</h2>
+            <ul class="reasons" th:unless="${#lists.isEmpty(r.factors)}"><li th:each="f : ${r.factors}" th:text="${f.description} + ' (+' + ${f.points} + ')'">reason</li></ul>
+            <p class="muted" th:if="${#lists.isEmpty(r.factors)}">No risk factors detected.</p>
+          </div>
+        </div>
+        <div class="card section">
+          <button class="btn big" data-action="deploy" th:data-project="${selected.id}">SIMULATE DEPLOYMENT</button>
+          <span class="muted small">&nbsp;Simulation only: nothing is deployed to production or the cloud.</span>
+          <div id="deployResult" class="result" hidden></div>
+        </div>
+      </th:block>
+    </section>
+  </main>
+</div>
+<div th:replace="~{fragments :: foot}"></div>
+</body>
+</html>

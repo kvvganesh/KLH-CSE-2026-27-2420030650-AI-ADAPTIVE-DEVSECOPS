@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Welcome')}"></head>
+<body>
+<div class="login">
+  <div class="card">
+    <div class="brand"><img th:src="@{/images/logo.svg}" alt="" width="40" height="40">
+      <div><strong>Adaptive DevSecOps</strong><small>Intelligent vulnerability assessment and secure deployment</small></div></div>
+    <p class="note">Demo sign-in only: there is no real authentication. Any values work.</p>
+    <form id="loginForm">
+      <div class="form-row"><label for="user">Username</label><input id="user" name="user" value="demo.user" autocomplete="off"></div>
+      <div class="form-row"><label for="pass">Password</label><input id="pass" name="pass" type="password" autocomplete="off" placeholder="any value"></div>
+      <button class="btn big" type="submit" style="width:100%">Enter platform</button>
+    </form>
+    <p class="muted small" style="margin-top:14px">Every scan result and deployment in this application is simulated for demonstration.</p>
+  </div>
+</div>
+<div th:replace="~{fragments :: foot}"></div>
+</body>
+</html>

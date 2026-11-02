@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Pipeline')}"></head>
+<body>
+<div class="app">
+  <aside th:replace="~{fragments :: sidebar('pipelines')}"></aside>
+  <main>
+    <header th:replace="~{fragments :: topbar('Pipeline', true)}"></header>
+    <section class="content">
+      <p class="note" th:text="${selected.scenario.name() == 'LIVE'} ? 'Live mode: the repository is cloned and scanned locally (Maven tests, Gitleaks, plus SonarQube and Dependency-Check if enabled). Scans can take minutes, and the project tests are executed, so only scan repositories you trust.' : 'Simulated mode: results come from the selected demo scenario. Choose Live local scan in the header to scan a real repository. The real CI runs in GitHub Actions.'">note</p>
+      <div class="grid g2">
+        <div class="card">
+          <h2 th:text="${selected.name} + ' pipeline'">Pipeline</h2>
+          <p class="muted" th:text="${run != null} ? ('Latest: #' + ${run.id} + ' at ' + ${run.startedAt}) : 'No run yet'">Latest</p>
+          <div class="flow">
+            <div class="stage" th:each="st : ${stages}" th:classappend="'s-' + ${st.status}">
+              <div><div class="name" th:text="${st.name}">STAGE</div><div class="tool" th:text="${st.tool}">tool</div></div>
+              <span class="badge" th:classappend="'b-' + ${st.status}" th:text="${st.status}">PENDING</span>
+            </div>
+          </div>
+          <p style="margin-top:20px"><button id="runBtn" class="btn big" data-action="run" data-animate="true" th:data-project="${selected.id}">RUN PIPELINE</button></p>
+        </div>
+        <div class="card" th:if="${run != null}">
+          <h2>Latest result</h2>
+          <dl class="kv">
+            <dt>Status</dt><dd><span class="badge" th:classappend="'b-' + ${run.status}" th:text="${run.status}">x</span></dd>
+            <dt>Risk</dt><dd><span class="badge" th:classappend="'b-' + ${run.risk.level}" th:text="${run.risk.level} + ' (' + ${run.risk.score} + ')'">x</span></dd>
+            <dt>Decision</dt><dd th:text="${run.decision.decision.label}">x</dd>
+          </dl>
+          <div class="actions" style="margin-top:14px">
+            <a class="btn ghost sm" th:href="@{/security-scans(project=${selected.id})}">Scan results</a>
+            <a class="btn ghost sm" th:href="@{/risk(project=${selected.id})}">Risk analysis</a>
+            <a class="btn ghost sm" th:href="@{/deployments(project=${selected.id})}">Deployment</a>
+          </div>
+        </div>
+      </div>
+      <div class="card section">
+        <h2>Run history</h2>
+        <div class="tablewrap"><table>
+          <thead><tr><th>Pipeline</th><th>Date</th><th>Status</th><th>Score</th><th>Risk</th><th>Decision</th></tr></thead>
+          <tbody>
+            <tr th:each="h : ${history}">
+              <td th:text="'#' + ${h.id}">#1</td><td th:text="${h.startedAt}">d</td>
+              <td><span class="badge" th:classappend="'b-' + ${h.status}" th:text="${h.status}">x</span></td>
+              <td th:text="${h.risk.score}">0</td>
+              <td><span class="badge" th:classappend="'b-' + ${h.risk.level}" th:text="${h.risk.level}">x</span></td>
+              <td th:text="${h.decision.decision.label}">x</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(history)}"><td colspan="6" class="muted">No runs yet.</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </section>
+  </main>
+</div>
+<div th:replace="~{fragments :: foot}"></div>
+</body>
+</html>

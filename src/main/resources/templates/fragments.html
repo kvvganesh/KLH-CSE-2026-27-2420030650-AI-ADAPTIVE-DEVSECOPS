@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title th:text="${title} + ' | Adaptive DevSecOps'">Adaptive DevSecOps</title>
+  <link rel="icon" th:href="@{/images/logo.svg}" type="image/svg+xml">
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<aside class="sidebar" th:fragment="sidebar(active)"
+       th:with="q=${selected != null} ? ('?project=' + ${selected.id}) : ''">
+  <div class="brand">
+    <img th:src="@{/images/logo.svg}" alt="" width="32" height="32">
+    <div><strong>Adaptive DevSecOps</strong><small>Security platform</small></div>
+  </div>
+  <nav>
+    <a th:href="@{/dashboard}" th:classappend="${active == 'dashboard'} ? 'active'">Dashboard</a>
+    <a th:href="@{/projects}" th:classappend="${active == 'projects'} ? 'active'">Projects</a>
+    <a th:href="@{'/pipelines' + ${q}}" th:classappend="${active == 'pipelines'} ? 'active'">Pipelines</a>
+    <a th:href="@{'/security-scans' + ${q}}" th:classappend="${active == 'scans'} ? 'active'">Security Scans</a>
+    <a th:href="@{'/vulnerabilities' + ${q}}" th:classappend="${active == 'vulnerabilities'} ? 'active'">Vulnerability Assessment</a>
+    <a th:href="@{'/risk' + ${q}}" th:classappend="${active == 'risk'} ? 'active'">Risk Analysis</a>
+    <a th:href="@{'/deployments' + ${q}}" th:classappend="${active == 'deployments'} ? 'active'">Deployments</a>
+    <a th:href="@{/reports}" th:classappend="${active == 'reports'} ? 'active'">Reports</a>
+    <a th:href="@{/settings}" th:classappend="${active == 'settings'} ? 'active'">Settings</a>
+    <a th:href="@{/documentation}" th:classappend="${active == 'documentation'} ? 'active'">Documentation</a>
+  </nav>
+</aside>
+
+<header class="topbar" th:fragment="topbar(title, scoped)">
+  <h1 th:text="${title}">Title</h1>
+  <div class="topbar-right" th:if="${scoped}">
+    <label for="projectSelect">Project</label>
+    <select id="projectSelect">
+      <option th:each="p : ${allProjects}" th:value="${p.id}" th:text="${p.name}" th:selected="${p.id == selected.id}"></option>
+    </select>
+    <span>Scan mode</span>
+    <div class="seg" th:data-project="${selected.id}">
+      <button type="button" class="seg-btn" th:each="s : ${scenarios}" data-action="scenario"
+              th:data-scenario="${s.name()}" th:classappend="${selected.scenario == s} ? 'on'" th:text="${s.label}">Safe</button>
+    </div>
+  </div>
+  <div class="user">Demo user &middot; <a th:href="@{/}">Sign out</a></div>
+</header>
+
+<th:block th:fragment="empty">
+  <div class="card empty">
+    <h2>No pipeline has run for this project yet</h2>
+    <p class="muted">Run the pipeline to generate scan results, a risk score, and a deployment decision.</p>
+    <button class="btn big" data-action="run" th:data-project="${selected.id}">RUN PIPELINE</button>
+  </div>
+</th:block>
+
+<div th:fragment="foot">
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script th:src="@{/js/app.js}"></script>
+</div>
+
+</body>
+</html>
